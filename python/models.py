@@ -23,7 +23,6 @@ import torch.nn as nn
 from torch.nn import functional as F
 from torch.autograd import Variable
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
-import adabound
 
 #----------------------------------------------------------------
 

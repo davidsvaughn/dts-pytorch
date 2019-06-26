@@ -23,7 +23,6 @@ import torch.nn as nn
 from torch.nn import functional as F
 from torch.autograd import Variable
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
-import adabound
 
 import models as mod
 
@@ -186,7 +185,7 @@ p.directions = 1
 p.out = [-1]  # [-1, 0, 1, 100] == [last, mean, max, attn]
 p.act = F.relu      # F.relu , torch.tanh
 p.hinit = 0         # [0, 1, 2, 3] == [zeros, rand, xavier_norm, xavier_uni]
-p.opt = 'adam'      # adam adabound adagrad sgd
+p.opt = 'adam'      # adam adagrad sgd
 p.dropout = 0.75
 p.lr = 0.001
 p.clip = 5.0
