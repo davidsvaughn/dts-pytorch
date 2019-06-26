@@ -2,6 +2,7 @@
 *.pydevproject
 *.pyc
 *.settings
-venv
+venv/
+chkpt/
 
 
