@@ -3,6 +3,7 @@
 *.pyc
 *.settings
 venv/
-chkpt/
-
+chkpt/*.pt
+chkpt/*.txt
+data/*/*/*.txt
 

@@ -28,27 +28,20 @@ import models as mod
 
 device = torch.device("cuda:0")
 
-# def find_files(path): return glob.glob(path)
-# print('\n'.join(find_files('C:/Users/dvaughn/insuff/data/bw/tmp_*.txt')))
-
 #----------------------------------------------------------------
 
-group = 'bw'
+group = 'rs' # rs | bw | fw
 
-fn_train = '/home/david/data/insuff/travis/{}/tmp_train_all.txt'.format(group)
-fn_test = '/home/david/data/insuff/travis/{}/tmp_test.txt'.format(group)
-fn_val = '/home/david/data/insuff/travis/{}/tmp_valid.txt'.format(group)
-model_dir = '/home/david/code/python/dts-pytorch/chkpt'
+data_dir = '../data/insufficient'
+model_dir = '../chkpt'
 
-fn_roc_val = '/home/david/code/python/dts-pytorch/chkpt/roc_{}_val.txt'.format(group)
-fn_roc_test = '/home/david/code/python/dts-pytorch/chkpt/roc_{}_test.txt'.format(group)
+fn_train = '{}/{}/tmp_train_all.txt'.format(data_dir, group)
+fn_test = '{}/{}/tmp_test.txt'.format(data_dir, group)
+fn_val = '{}/{}/tmp_valid.txt'.format(data_dir, group)
 
-'''
-fn_train = 'C:/Users/dvaughn/insuff/data/{}/tmp_train_all.txt'.format(group)
-fn_test = 'C:/Users/dvaughn/insuff/data/{}/tmp_test.txt'.format(group)
-fn_val = 'C:/Users/dvaughn/insuff/data/{}/tmp_valid.txt'.format(group)
-model_dir = 'C:/Users/dvaughn/insuff/code/pytorch/insuff'
-'''
+fn_roc_val = '{}/roc_{}_val.txt'.format(model_dir, group)
+fn_roc_test = '{}/roc_{}_test.txt'.format(model_dir, group)
+
 
 #----------------------------------------------------------------
 vocab = [chr(i) for i in range(32, 127)]
@@ -302,7 +295,7 @@ for epoch in range(epochs):
     # if epoch==1: batch_size*=2
     # if epoch==3: batch_size*=2
 
-    print_iter = (10000 if group is 'fw' else 5000) // batch_size
+    print_iter = (20000 if group is 'fw' else 10000) // batch_size
 
     np.random.shuffle(idx)
     x_train = x_train[idx]
@@ -316,7 +309,7 @@ for epoch in range(epochs):
         current_idx += batch_size
         if len(batch_x) == 0: continue
         #############################################
-        ''' critical section '''
+        ''' critical training section '''
 
         # get input tensors
         X, L, ty, _ = vectorize_seqs(batch_x, batch_y, vocab=vocab, cuda=CUDA)
