@@ -30,12 +30,14 @@ import models as mod
 device = torch.device("cuda:0")
 
 
-''' RUN '''
-# python -u train.py | tee log.txt
+''' RUN COMMAND '''
+''' python -u train.py | tee log.txt '''
 
 #----------------------------------------------------------------
 
-group = 'rs' # rs | bw | fw
+''' SET GROUP HERE: rs (research) | bw (brief write) | fw (full write) '''
+group = 'bw' # rs | bw | fw
+
 
 data_dir = '../data/insufficient'
 model_dir = '../chkpt/{}'.format(group)
