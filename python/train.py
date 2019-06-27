@@ -9,6 +9,8 @@ import unicodedata
 import random
 import time
 import math
+import pprint
+import shutil
 import re
 import csv
 import pandas as pd
@@ -23,17 +25,20 @@ import torch.nn as nn
 from torch.nn import functional as F
 from torch.autograd import Variable
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
-
 import models as mod
 
 device = torch.device("cuda:0")
+
+
+''' RUN '''
+# python -u train.py | tee log.txt
 
 #----------------------------------------------------------------
 
 group = 'rs' # rs | bw | fw
 
 data_dir = '../data/insufficient'
-model_dir = '../chkpt'
+model_dir = '../chkpt/{}'.format(group)
 
 fn_train = '{}/{}/train.txt'.format(data_dir, group)
 fn_test = '{}/{}/test.txt'.format(data_dir, group)
@@ -42,6 +47,12 @@ fn_val = '{}/{}/valid.txt'.format(data_dir, group)
 fn_roc_val = '{}/roc_{}_val.txt'.format(model_dir, group)
 fn_roc_test = '{}/roc_{}_test.txt'.format(model_dir, group)
 
+if not os.path.exists(model_dir):
+    os.makedirs(model_dir)
+    
+log_file = os.path.abspath(os.path.join(os.getcwd(), 'log.txt'))
+def save_log():
+    shutil.copy2(log_file, model_dir)
 
 #----------------------------------------------------------------
 vocab = [chr(i) for i in range(32, 127)]
@@ -49,10 +60,7 @@ letters = ''.join(vocab)
 # PAD = '#'
 # letters = string.printable.replace(PAD,'')[:-4]
 # vocab = [PAD] + list(letters)
-
 print(letters)
-# print(len(letters))
-# sys.exit()
 
 # Turn a Unicode string to plain ASCII, thanks to https://stackoverflow.com/a/518232/2809427
 def unicode_to_ascii(s):
@@ -148,7 +156,7 @@ def vectorize_seqs(seqs, labels, ids=None, vocab=vocab, cuda=True):
     for idx, (seq, seqlen) in enumerate(zip(vectorized_seqs, seq_lens)):
         seq_tensor[idx, :seqlen] = torch.LongTensor(seq)
 
-    # SORT YOUR TENSORS BY LENGTH! (for packing)
+    # SORT TENSORS BY LENGTH! (for packing)
     seq_lens, perm_idx = seq_lens.sort(0, descending=True)
     seq_tensor = seq_tensor[perm_idx]
 
@@ -165,40 +173,45 @@ def vectorize_seqs(seqs, labels, ids=None, vocab=vocab, cuda=True):
 
     return cudify(seq_tensor, cuda), cudify(seq_lens, cuda), seq_labels, ids
 
-
-batch_size = 100     # 50 if group is 'fw' else 25
+'''
+------------------------------------------------------
+SET PARAMETERS HERE =>
+'''
+batch_size      = 100     # 50 if group is 'fw' else 25
+epochs          = 50
 
 p = adict({})
-p.rnn = mod.MyGRU       # MyGRU , MyLSTM
+p.rnn           = mod.MyGRU # MyGRU , MyLSTM
 p.embedding_dim = 20
-p.hidden_size = 250
-p.dense_size = 0
-p.nb_layers = 1
-p.directions = 1
-p.out = [-1]  # [-1, 0, 1, 100] == [last, mean, max, attn]
-p.act = F.relu      # F.relu , torch.tanh
-p.hinit = 0         # [0, 1, 2, 3] == [zeros, rand, xavier_norm, xavier_uni]
-p.opt = 'adam'      # adam adagrad sgd
-p.dropout = 0.75
-p.lr = 0.001
-p.clip = 5.0
-p.vocab = vocab
+p.hidden_size   = 250
+p.dense_size    = 0
+p.nb_layers     = 1
+p.directions    = 1
+p.out           = [-1]      # [-1, 0, 1, 100] == [last, mean, max, attn]
+p.act           = F.relu    # F.relu , torch.tanh
+p.hinit         = 0         # [0, 1, 2, 3] == [zeros, rand, xavier_norm, xavier_uni]
+p.opt           = 'adam'    # adam adagrad sgd
+p.dropout       = 0.75
+p.lr            = 0.001
+p.clip          = 5.0
+p.batch_size    = batch_size
 
-epochs = 50
+print('\nPARAMETERS:')
+pprint.pprint(p)
+print('')
+
+p.vocab = vocab
 test_p = 0.1 if group is 'fw' else 0.5
 
-#----------------------------------------------------------------
+''' END PARAMETERS
+------------------------------------------------------
+'''
 
 CUDA = True
 model = mod.MyModel(p, cuda=CUDA)
 
 for i in model.parameters():
     print(i.shape)
-
-## sanity check...
-# x, y = x_train[:batch_size], y_train[:batch_size]
-# x, seq_lens, y, _ = vectorize_seqs(x, y, vocab=vocab)
-# print(model(x, seq_lens).shape)
 
 ## JIT
 x, y = x_train[:batch_size], y_train[:batch_size]
@@ -207,6 +220,8 @@ x_samp, len_samp = x[:1], seq_lens[:1]
 
 print('SAMPLE SHAPE: {}'.format(x_samp.shape))
 print('LENGTH SHAPE: {}'.format(len_samp.shape))
+
+save_log()
 
 def save_model(epoch, in_mode=None, save_mode=0):
     global model, x_samp, len_samp
@@ -227,8 +242,6 @@ def save_model(epoch, in_mode=None, save_mode=0):
     model.train(True)
 
 save_model(0)
-
-# sys.exit()
 
 # ## https://pytorch.org/tutorials/beginner/blitz/tensor_tutorial.html
 # x = x.to('cuda')
@@ -343,6 +356,7 @@ for epoch in range(epochs):
             # print(loss.item(), '\tb:', b, '\tepoch', epoch, 'f1', f1)
             print('\t{0}%  eps:{1}\tacc:{2:0.4f}'.format(int(per), int(eps), test_acc))
             start = time.time()
+            save_log()
 
     train_acc = accuracy_score(np.hstack(P), np.hstack(T))
     valid_acc = accuracy_score(*eval_valid())
@@ -354,3 +368,4 @@ for epoch in range(epochs):
     print('\t{0}'.format(timeSince(start_epoch)))
 
     save_model(epoch)
+    save_log()

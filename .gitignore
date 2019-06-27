@@ -3,9 +3,8 @@
 *.pyc
 *.settings
 
+python/log.txt
+chkpt/*/*.pt
+chkpt/*/*.txt
 data/*/*/*.txt
-
 venv/
-chkpt/*.pt
-chkpt/*.txt
-
