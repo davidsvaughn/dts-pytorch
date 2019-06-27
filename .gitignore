@@ -2,8 +2,10 @@
 *.pydevproject
 *.pyc
 *.settings
+
+data/*/*/*.txt
+
 venv/
 chkpt/*.pt
 chkpt/*.txt
-data/*/*/*.txt
 

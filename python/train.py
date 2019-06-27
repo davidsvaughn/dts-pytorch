@@ -35,9 +35,9 @@ group = 'rs' # rs | bw | fw
 data_dir = '../data/insufficient'
 model_dir = '../chkpt'
 
-fn_train = '{}/{}/tmp_train_all.txt'.format(data_dir, group)
-fn_test = '{}/{}/tmp_test.txt'.format(data_dir, group)
-fn_val = '{}/{}/tmp_valid.txt'.format(data_dir, group)
+fn_train = '{}/{}/train.txt'.format(data_dir, group)
+fn_test = '{}/{}/test.txt'.format(data_dir, group)
+fn_val = '{}/{}/valid.txt'.format(data_dir, group)
 
 fn_roc_val = '{}/roc_{}_val.txt'.format(model_dir, group)
 fn_roc_test = '{}/roc_{}_test.txt'.format(model_dir, group)
