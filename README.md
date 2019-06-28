@@ -28,3 +28,7 @@ pip3 install torch torchvision
 cd python
 python -u train.py | tee log.txt
 ```
+
+- this code implements a _flat_ (not hierarchical) RNN model on _character_ sequences
+- so far, only binary classification has been implemented (for insufficient filter)
+- use dts-tf as a guide to extend to qwk regression
