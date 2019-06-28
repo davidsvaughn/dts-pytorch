@@ -29,11 +29,13 @@ import models as mod
 
 device = torch.device("cuda:0")
 
+''' RUN COMMAND'''
+# python train.py
+# --OR--
+# python -u train.py | tee log.txt   (... log will be copied to output folder - preferred)
+
 ''' SET GROUP HERE: rs (research) | bw (brief write) | fw (full write) '''
 group = 'fw' # rs | bw | fw
-
-''' RUN COMMAND '''
-''' python -u train.py | tee log.txt '''
 
 #----------------------------------------------------------------
 
@@ -52,7 +54,10 @@ if not os.path.exists(model_dir):
     
 log_file = os.path.abspath(os.path.join(os.getcwd(), 'log.txt'))
 def save_log():
-    shutil.copy2(log_file, model_dir)
+    try:
+        shutil.copy2(log_file, model_dir)
+    except IOError:
+        pass        
 
 #----------------------------------------------------------------
 vocab = [chr(i) for i in range(32, 127)]
