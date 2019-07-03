@@ -23,7 +23,7 @@ pip install -U pprint
 pip3 install torch torchvision
 ```
 
-## Set Config Parameters:
+## Set Config Parameters
 - line 33: `group = 'fw' # rs=research | bw= brief write | fw = full write`
 - lines 180-200: all other parameters (DNN model, training, etc)
 
