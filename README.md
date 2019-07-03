@@ -5,10 +5,10 @@ Deep Text Scoring - in PyTorch
 - so far, only binary classification has been implemented (for insufficient filter)
 - use dts-tf as a guide to extend to qwk regression
 
-## Get data from spshare
+## Get data from spshare:
 copy files from: //spshare/users/dvaughn/dts-pytorch/data -> ./data
 
-## PyTorch Setup
+## PyTorch Setup:
 ```
 virtualenv -p python3 venv
 source venv/bin/activate
